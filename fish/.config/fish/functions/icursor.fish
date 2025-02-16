@@ -27,13 +27,14 @@ function icursor
 
     # Run the appropriate fzf command
     if test "$mode" = "files"
-        set -l selection (find $search_path -type f -print | fzf -m --preview="bat --color=always {}")
+        set selection (find $search_path -type f -readable -print 2>/dev/null | fzf -m --preview="bat --color=always {} 2>/dev/null || echo 'Unable to preview file'")
     else
-        set -l selection (find $search_path -type d -print | fzf)
+        set selection (find $search_path -type d -readable -print 2>/dev/null | fzf)
     end
 
     # Check if selection is empty (Ctrl+C or no selection)
     if test -n "$selection"
+        echo "cursor $selection"
         cursor $selection
     end
 end
