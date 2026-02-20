@@ -1,6 +1,7 @@
 function icursor
     set -l mode "dirs"  # Default mode is directories
     set -l search_path "."  # Default search path is the current directory
+    set -l should_exit true  # Default is to exit after selection
 
     # Parse arguments
     set -l args $argv
@@ -20,6 +21,11 @@ function icursor
         set mode "files"
     end
 
+    # Check for the flag to prevent exiting
+    if echo $flags | grep -q -e "--no-exit" -e "-n"
+        set should_exit false
+    end
+
     # If there's a path, use it; otherwise, use the default "."
     if test (count $non_flags) -gt 0
         set search_path $non_flags[1]
@@ -34,7 +40,12 @@ function icursor
 
     # Check if selection is empty (Ctrl+C or no selection)
     if test -n "$selection"
-        echo "cursor $selection"
+        echo "Selected: $selection"
         cursor $selection
+        if test "$should_exit" = "true"
+            exit
+        end
+    else
+        echo "No selection made"    
     end
 end
